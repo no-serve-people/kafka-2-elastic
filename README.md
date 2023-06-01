@@ -9,8 +9,6 @@ github.com/confluentinc/confluent-kafka-go/v2/kafka库
 github.com/elastic/go-elasticsearch/v7库
 您可以使用以下命令通过Go模块管理器下载依赖：
 
-go
-Copy code
 go mod tidy
 ### 配置
 在程序的main函数中，您需要进行以下配置：
@@ -20,14 +18,10 @@ group：消费者组ID。
 topicRules：要订阅的主题和相应的规则。
 确保将Addresses字段的值设置为Elasticsearch的地址：
 
-vbnet
-Copy code
 Addresses: []string{"http://xxx:9200"},
 ### 使用
 运行程序：
 
-go
-Copy code
 go run main.go
 程序将会创建一个Kafka消费者，并根据配置的规则从相应的主题中消费消息。满足规则的消息将会被过滤并写入到Elasticsearch中进行索引。
 
