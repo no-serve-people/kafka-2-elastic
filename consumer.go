@@ -36,14 +36,14 @@ func (c *Consumer) ElasticWrite(f *FilterData) {
 	var now = time.Now()
 	curdate := now.Format("2006.01.02")
   
-  // @fixme 极致性能 这个可以使用 bulk 方法 批量发送
+        // @fixme 极致性能 这个可以使用 bulk 方法 批量发送
 	res, err := c.Esclient.Index("go-monitor-index-"+curdate, esutil.NewJSONReader(&f))
 	if err != nil {
 		log.Printf("插入ES错误：%v ,插入数据为：%v", err, *f)
 	}
 
 	defer res.Body.Close()
-  // 不读取 不会归还到idleConn
+        // 不读取 不会归还到idleConn
 	io.ReadAll(res.Body)
 }
 
