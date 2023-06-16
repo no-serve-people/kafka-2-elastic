@@ -3,14 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esutil"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esutil"
 )
 
 type TopicRules struct {
@@ -33,17 +34,17 @@ type FilterData struct {
 }
 
 func (c *Consumer) ElasticWrite(f *FilterData) {
-	var now = time.Now()
+	now := time.Now()
 	curdate := now.Format("2006.01.02")
-  
-        // @fixme 极致性能 这个可以使用 bulk 方法 批量发送
+
+	// @fixme 极致性能 这个可以使用 bulk 方法 批量发送
 	res, err := c.Esclient.Index("go-monitor-index-"+curdate, esutil.NewJSONReader(&f))
 	if err != nil {
 		log.Printf("插入ES错误：%v ,插入数据为：%v", err, *f)
 	}
 
 	defer res.Body.Close()
-        // 不读取 不会归还到idleConn
+	// 不读取 不会归还到idleConn
 	io.ReadAll(res.Body)
 }
 
@@ -53,7 +54,7 @@ func NewConsumer(topicRules []TopicRules, groupID, brokers string) *Consumer {
 		Transport: &http.Transport{
 			MaxIdleConnsPerHost: 200, // 设置每个主机的最大闲置连接数
 			MaxIdleConns:        300, // 设置总的最大闲置连接数 不传默认值100
-			//MaxConnsPerHost:     0,   // 设置每个主机的最大连接数，0 表示不限制
+			// MaxConnsPerHost:     0,   // 设置每个主机的最大连接数，0 表示不限制
 		},
 	}
 
@@ -70,7 +71,6 @@ func NewConsumer(topicRules []TopicRules, groupID, brokers string) *Consumer {
 }
 
 func (c *Consumer) handleData() {
-
 	// Kafka 消费者配置
 	consumerConfig := &kafka.ConfigMap{
 		"bootstrap.servers": c.Brokers, // Kafka 服务器地址
@@ -115,7 +115,7 @@ func (c *Consumer) handleData() {
 						}
 
 						for _, rule := range tprule.Rules {
-							var flag = true
+							flag := true
 							for _, r := range rule {
 								if !strings.Contains(msg["message"].(string), r) {
 									flag = false
@@ -138,7 +138,7 @@ func (c *Consumer) handleData() {
 							}
 						}
 
-						//fmt.Printf("Received message from partition %d: %s\n", e.TopicPartition.Partition, string(e.Value))
+						// fmt.Printf("Received message from partition %d: %s\n", e.TopicPartition.Partition, string(e.Value))
 					case kafka.Error:
 						log.Printf("Error: %v\n", e)
 					}
@@ -153,9 +153,9 @@ func (c *Consumer) handleData() {
 }
 
 func main() {
-	var kfk_broker = "xxxxxxx"
-	group := xxx-goland"
-	var topicRules = []TopicRules{{Topic: "aaa", Rules: [][]string{{"接口调用失败"}}}, {Topic: "bbb", Rules: [][]string{{"ERROR"}}}}
+	kfk_broker := "xxxxxxx"
+	group := "xxx-goland"
+	topicRules := []TopicRules{{Topic: "aaa", Rules: [][]string{{"接口调用失败"}}}, {Topic: "bbb", Rules: [][]string{{"ERROR"}}}}
 
 	NewConsumer(topicRules, group, kfk_broker).handleData()
 }
